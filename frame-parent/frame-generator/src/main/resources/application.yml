@@ -1,0 +1,52 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /frame-generator
+
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    #MySQL配置
+    driverClassName: com.mysql.cj.jdbc.Driver  #mysql8.0改为 com.mysql.cj.jdbc.Driver,mysql5.x为com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/frame?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
+    username: root
+    password: root
+#    url: jdbc:mysql://localhost:3306/frame?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+#    username: root
+#    password: root
+    #oracle配置
+#    driverClassName: oracle.jdbc.OracleDriver
+#    url: jdbc:oracle:thin:@localhost:1521:frame
+#    username: root
+#    password: root
+    #SQLServer配置
+#    driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#    url: jdbc:sqlserver://localhost:1433;DatabaseName=frame
+#    username: root
+#    password: root
+    #PostgreSQL配置
+#    driverClassName: org.postgresql.Driver
+#    url: jdbc:postgresql://localhost:5432/frame
+#    username: root
+#    password: root
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  resources:
+    static-locations: classpath:/static/,classpath:/views/
+
+
+mybatis:
+  mapperLocations: classpath:mapper/**/*.xml
+
+
+pagehelper:
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+
+#指定数据库，可选值有【mysql、oracle、sqlserver、postgresql】
+frame:
+  database: mysql

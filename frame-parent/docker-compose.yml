@@ -1,0 +1,14 @@
+version: '2'
+services:
+  frame-admin:
+    image: frame/admin
+    ports:
+      - "8080:8080"
+    environment:
+      - spring.profiles.active=dev
+  renren-api:
+    image: frame/api
+    ports:
+      - "8081:8081"
+    environment:
+      - spring.profiles.active=dev
