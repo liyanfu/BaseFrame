@@ -1,38 +1,45 @@
 $(function () {
-	layui.use('table', function(){
-	 var table = layui.table;
-	  table.render({
-	    elem: '#tableGrid'
-	    ,url: baseURL + 'sys/user/list'
-	    ,height: 312
-	    ,toolbar:''
-	    ,parseData:function(res){ //res 即为原始返回的数据
-	    	    return {
-	    	      "code": res.code, //解析接口状态
-	    	      "msg": res.msg, //解析提示文本
-	    	      "count": res.page.totalCount, //解析数据长度
-	    	      "data": res.page.list //解析数据列表
-	    	    };
-	    }
-	    ,page: true //开启分页
-	    ,cellMinWidth: 140 
-	    ,cols: [[
-	       {type: 'checkbox'}
-	      ,{field:'userId',  title: '用户ID', sort: true}
-	      ,{field:'username',  title: '用户名'}
-	      ,{field:'deptName',  title: '所属部门'}
-	      ,{field:'email',  title: '邮箱'}
-	      ,{field:'mobile', title: '手机号'} 
-	      ,{field:'status', title: '状态', templet: function(d){
-				return d.status === 0 ? 
-						'<span class="label label-danger">禁用</span>' : 
-						'<span class="label label-success">正常</span>';
-				}}
-	      ,{field:'createTime', title: '创建时间'}
-	      
-	    ]]
-	  });
-	});
+    $("#jqGrid").jqGrid({
+        url: baseURL + 'sys/user/list',
+        datatype: "json",
+        colModel: [			
+			{ label: '用户ID', name: 'userId', index: "user_id", width: 45, key: true },
+			{ label: '用户名', name: 'username', width: 75 },
+            { label: '所属部门', name: 'deptName', sortable: false, width: 75 },
+			{ label: '邮箱', name: 'email', width: 90 },
+			{ label: '手机号', name: 'mobile', width: 100 },
+			{ label: '状态', name: 'status', width: 60, formatter: function(value, options, row){
+				return value === 0 ? 
+					'<span class="label label-danger">禁用</span>' : 
+					'<span class="label label-success">正常</span>';
+			}},
+			{ label: '创建时间', name: 'createTime', index: "create_time", width: 85}
+        ],
+		viewrecords: true,
+        height: 385,
+        rowNum: 10,
+		rowList : [10,30,50],
+        rownumbers: true, 
+        rownumWidth: 25, 
+        autowidth:true,
+        multiselect: true,
+        pager: "#jqGridPager",
+        jsonReader : {
+            root: "page.list",
+            page: "page.currPage",
+            total: "page.totalPage",
+            records: "page.totalCount"
+        },
+        prmNames : {
+            page:"page", 
+            rows:"limit", 
+            order: "order"
+        },
+        gridComplete:function(){
+        	//隐藏grid底部滚动条
+        	$("#jqGrid").closest(".ui-jqgrid-bdiv").css({ "overflow-x" : "hidden" }); 
+        }
+    });
 });
 var setting = {
     data: {
@@ -74,15 +81,11 @@ var vm = new Vue({
             vm.title = "新增";
             vm.roleList = {};
             vm.user = {deptName:null, deptId:null, status:1, roleIdList:[]};
-            console.info(1);
+
             //获取角色信息
             this.getRoleList();
-            console.info(3);
+
             vm.getDept();
-            console.info(4);
-            var form = layui.form;
-        	form.render();
-        	 console.info(5);
         },
         getDept: function(){
             //加载部门树
@@ -91,6 +94,7 @@ var vm = new Vue({
                 var node = ztree.getNodeByParam("deptId", vm.user.deptId);
                 if(node != null){
                     ztree.selectNode(node);
+
                     vm.user.deptName = node.name;
                 }
             })
@@ -159,15 +163,9 @@ var vm = new Vue({
             });
         },
         getRoleList: function(){
-        	$.ajax({  
-        	    type : "get",  
-        	    url : baseURL + "sys/role/select",  
-        	    async : false,//取消异步  
-        	    success : function(r){  
-        	    	 vm.roleList = r.list;
-                     console.info(2);
-        	    }
-        	});
+            $.get(baseURL + "sys/role/select", function(r){
+                vm.roleList = r.list;
+            });
         },
         deptTree: function(){
             layer.open({

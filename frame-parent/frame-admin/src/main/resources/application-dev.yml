@@ -1,11 +1,11 @@
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    driverClassName: com.mysql.cj.jdbc.Driver  #mysql8.0改为 com.mysql.cj.jdbc.Driver,mysql5.x为com.mysql.jdbc.Driver
+    driverClassName: com.mysql.jdbc.Driver  #mysql8.0改为 com.mysql.cj.jdbc.Driver,mysql5.x为com.mysql.jdbc.Driver
     druid:    #mysql8.0连接方式
-      url: jdbc:mysql://localhost:3306/frame?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
+      url: jdbc:mysql://120.78.138.125:3306/frame?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false
       username: root
-      password: root
+      password: root123
 #      first:  #数据源1
 #        url: jdbc:mysql://localhost:3306/frame?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
 #        username: root

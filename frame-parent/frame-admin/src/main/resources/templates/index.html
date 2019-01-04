@@ -40,7 +40,6 @@
 	  <div style="float:left;color:#fff;padding:15px 10px;">欢迎 {{user.username}}</div>
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
-          <li><a href="javascript:;" @click=""><i class="fa fa-jpy"></i> &nbsp;捐赠作者</a></li>
 		  <li><a href="javascript:;" @click="updatePassword"><i class="fa fa-lock"></i> &nbsp;修改密码</a></li>
           <li><a href="logout"><i class="fa fa-sign-out"></i> &nbsp;退出系统</a></li>
 		</ul>
@@ -57,7 +56,7 @@
       <!-- /.search form -->
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu">
-        <li class="header">导航菜单</li>
+        <!-- <li class="header">导航菜单</li>-->
         
         <!-- vue生成的菜单 -->
 		<menu-item :item="item" v-for="item in menuList"></menu-item>
@@ -77,6 +76,7 @@
     </section>
 
     <!-- Main content -->
+    
     <section class="content" style="background:#fff;">
       <iframe scrolling="yes" frameborder="0" style="width:100%;min-height:200px;overflow:visible;background:#fff;" :src="main"></iframe>
     </section>
@@ -88,7 +88,7 @@
     <div class="pull-right hidden-xs">
       Version 3.2.0
     </div>
-    Copyright &copy; 2018 <a href="http://www.fury.io" target="_blank">fury.io</a> All Rights Reserved
+    © Copyright &copy; 2018 <a href="http://www.fury.io" target="_blank">fury.io</a> All Rights Reserved
   </footer>
 
   <!-- Add the sidebar's background. This div must be placed

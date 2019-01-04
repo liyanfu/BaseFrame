@@ -1,7 +1,7 @@
 //jqGrid的配置信息
-$.jgrid.defaults.width = 1000;
-$.jgrid.defaults.responsive = true;
-$.jgrid.defaults.styleUI = 'Bootstrap';
+//$.jgrid.defaults.width = 1000;
+//$.jgrid.defaults.responsive = true;
+//$.jgrid.defaults.styleUI = 'Bootstrap';
 
 var baseURL = "../../";
 
