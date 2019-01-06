@@ -3,36 +3,40 @@
 <head>
 <title>管理员列表</title>
 <#include "/header.html">
-
+<style>
+.aaa{
+	background-color: green;
+}
+</style>
 </head>
 <body class="layui-body">
 <div id="rrapp" class="layui-fluid" v-cloak>
 	
 	<div v-show="showList" class="layui-row layui-col-space5">
-		<div class="layui-row">
+		<div class="layui-row layui-row layui-col-xs4 layui-col-md12">
 			<input type="text" v-model="q.username" @keyup.enter="query"  autocomplete="off" placeholder="用户名" class="layui-input">
 		</div>
 		
 		<div class="layui-row layui-col-space5">
-			<div class="layui-col-xs3 layui-col-md1">
-    			<button class="layui-btn layui-btn-sm" @click="query"><i class="layui-icon layui-icon-search"></i>查询</button>
+			<div class="layui-col-xs1 layui-col-md2">
+    			<button class="layui-btn layui-btn-sm layui-btn-primary" @click="query"><i class="layui-icon layui-icon-search"></i>查询</button>
   			</div>	  
 			
 			<#if shiro.hasPermission("sys:user:save")>
-			<div class="layui-col-xs3 layui-col-md1">
-    			<button class="layui-btn layui-btn-sm"  @click="add"><i class="layui-icon layui-icon-add-1"></i>新增</button>
+			<div class="layui-col-xs1 layui-col-md2">
+    			<button class="layui-btn layui-btn-sm "  @click="add"><i class="layui-icon layui-icon-add-1"></i>新增</button>
   			</div>
   			</#if>  
 				
 		    <#if shiro.hasPermission("sys:user:update")>
-		    <div class="layui-col-xs3 layui-col-md1">
-   				<button class="layui-btn layui-btn-sm" @click="update"><i class="layui-icon layui-icon-edit"></i>修改</button>
+		    <div class="layui-col-xs1 layui-col-md2">
+   				<button class="layui-btn layui-btn-sm layui-btn-warm" @click="update"><i class="layui-icon layui-icon-edit"></i>修改</button>
  				</div>
 			</#if>
 			
 			<#if shiro.hasPermission("sys:user:delete")>
-		    <div class="layui-col-xs3 layui-col-md1">
-   				<button class="layui-btn layui-btn-sm" @click="del"><i class="layui-icon layui-icon-delete"></i>删除</button>
+		    <div class="layui-col-xs1 layui-col-md2">
+   				<button class="layui-btn layui-btn-sm layui-btn-danger" @click="del"><i class="layui-icon layui-icon-delete"></i>删除</button>
  			</div>
 			</#if>
 		</div>
@@ -67,11 +71,16 @@
 			  <div class="layui-form-item">
 			    <label class="layui-form-label">角色</label>
 			    <div class="layui-input-block">
-					<label v-for="role in roleList" class="checkbox-inline">
-						<input type="checkbox" :value="role.roleId" v-model="user.roleIdList" class="layui-input">{{role.roleName}}
-					</label>
+					<select  xm-select="selectRoleIds" >
+			    		 <option v-for="role in roleList" :value="role.roleId" v-model="user.roleIdList" >{{role.roleName}}</option>
+					</select> 
 				</div>
 			</div>
+				<!-- <label v-for="role in roleList" class="checkbox-inline">
+				<input type="checkbox" :value="role.roleId" v-model="user.roleIdList"  lay-skin="primary">{{role.roleName}}
+				</label>  <select  xm-select="selectRoleIds" >
+		    		 <option v-for="role in roleList" :value="role.roleId" v-model="user.roleIdList">{{role.roleName}}</option>
+				</select> -->
   
 			 <div class="layui-form-item">
 			    <label class="layui-form-label">密码</label>
@@ -99,25 +108,26 @@
 			 <div class="layui-form-item">
 			    <label class="layui-form-label">状态</label>
 			    <div class="layui-input-block">
-			      <input type="radio" v-model="user.status" name="status" value="正常"  title="正常" checked="">
-			      <input type="radio" v-model="user.status" name="status" value="禁用" title="禁用">
-			    </div>
-			  </div>
-			
-			
-			 <div class="layui-form-item">
-			    <div class="layui-input-block">
-			      <button class="layui-btn" lay-submit="" @click="saveOrUpdate"  lay-filter="demo1">确定</button>
-			      <button  class="layui-btn layui-btn-primary"  @click="reload" >返回</button>
+			      <input type="radio" v-model="user.status" name="status" value="1"  title="正常" checked="">
+			      <input type="radio" v-model="user.status" name="status" value="0" title="禁用">
 			    </div>
 			  </div>
 		</form>
+		<!-- 放在form表单里，点击按钮会默认提交表单 -->
+		<div class="layui-form-item">
+		    <div class="layui-input-block">
+		      <button class="layui-btn layui-btn-radius" lay-submit="" @click="saveOrUpdate" >确定</button>
+		      <button  class="layui-btn layui-btn-primary layui-btn-radius"  @click="reload" >返回</button>
+		    </div>
+		</div>
 	</div>
-</div>
 
-<!-- 选择部门 -->
-<div id="deptLayer" style="display: none;padding:10px;">
-	<ul id="deptTree" class="ztree"></ul>
+	<!-- 选择部门 -->
+	<div class="layui-row layui-col-xs4 layui-col-md12">
+		<div id="deptLayer" style="display: none;padding:10px;">
+			<ul id="deptTree" class="ztree"></ul>
+		</div>
+	</div>	
 </div>
 
 <script src="${request.contextPath}/statics/js/modules/sys/user.js?_${.now?long}"></script>

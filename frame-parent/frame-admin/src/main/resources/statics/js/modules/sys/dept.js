@@ -1,3 +1,42 @@
+$(function(){
+	
+	initTable();
+	
+});
+
+
+var  initTable  = function(){
+	var treetable = layui.treetable;
+	treetable.render({
+		 	treeColIndex: 2,          
+	        treeSpid: 0,             
+	        treeIdName: 'deptId',       
+	        treePidName: 'parentId',     
+	        treeDefaultClose: true,   //是否默认折叠
+	        treeLinkage: false,        //父级展开时是否自动展开所有子级
+	        elem: '#tableGrid'
+		    ,url: baseURL + 'sys/dept/list'
+		    ,height: 312
+		    ,toolbar:''
+		    ,parseData:function(res){ //res 即为原始返回的数据
+		    	    return {
+		    	      "data": res //解析数据列表
+		    	    };
+		    }
+		    ,cellMinWidth: 140 
+		    ,cols:  [[
+	        	 {type: 'radio'}
+	             ,{field: 'deptId', title: '部门ID'}
+	             ,{field: 'name', title: '部门名称'}
+	             ,{field: 'parentName', title: '上级部门'}
+	             ,{field: 'orderNum', title: '排序号'}
+	         ]]
+		  });
+	
+	vm.tableId = 'tableGrid';
+	vm.table = treetable;
+}
+
 var setting = {
     data: {
         simpleData: {
@@ -24,6 +63,8 @@ var vm = new Vue({
             orderNum:0
         }
     },
+    table:null,
+    tableId: null,
     methods: {
         getDept: function(){
             //加载部门树
@@ -42,7 +83,11 @@ var vm = new Vue({
             vm.getDept();
         },
         update: function () {
-            var deptId = getDeptId();
+        	var rowData = getSelectedRow(layui.table,vm.tableId);
+        	if(rowData == null){
+                 return ;
+            }
+        	var deptId = rowData.deptId;
             if(deptId == null){
                 return ;
             }
@@ -56,11 +101,14 @@ var vm = new Vue({
             });
         },
         del: function () {
-            var deptId = getDeptId();
+        	var rowData = getSelectedRow(layui.table,vm.tableId);
+        	if(rowData == null){
+                 return ;
+            }
+        	var deptId = rowData.deptId;
             if(deptId == null){
                 return ;
             }
-
             confirm('确定要删除选中的记录？', function(){
                 $.ajax({
                     type: "POST",
@@ -119,7 +167,7 @@ var vm = new Vue({
         },
         reload: function () {
             vm.showList = true;
-            Dept.table.refresh();
+            initTable();
         }
     }
 });
@@ -129,43 +177,3 @@ var Dept = {
     table: null,
     layerIndex: -1
 };
-
-/**
- * 初始化表格的列
- */
-Dept.initColumn = function () {
-    var columns = [
-        {field: 'selectItem', radio: true},
-        {title: '部门ID', field: 'deptId', visible: false, align: 'center', valign: 'middle', width: '80px'},
-        {title: '部门名称', field: 'name', align: 'center', valign: 'middle', sortable: true, width: '180px'},
-        {title: '上级部门', field: 'parentName', align: 'center', valign: 'middle', sortable: true, width: '100px'},
-        {title: '排序号', field: 'orderNum', align: 'center', valign: 'middle', sortable: true, width: '100px'}]
-    return columns;
-};
-
-
-function getDeptId () {
-    var selected = $('#deptTable').bootstrapTreeTable('getSelections');
-    if (selected.length == 0) {
-        alert("请选择一条记录");
-        return null;
-    } else {
-        return selected[0].id;
-    }
-}
-
-
-$(function () {
-    $.get(baseURL + "sys/dept/info", function(r){
-        var colunms = Dept.initColumn();
-        var table = new TreeTable(Dept.id, baseURL + "sys/dept/list", colunms);
-        table.setRootCodeValue(r.deptId);
-        table.setExpandColumn(2);
-        table.setIdField("deptId");
-        table.setCodeField("deptId");
-        table.setParentCodeField("parentId");
-        table.setExpandAll(false);
-        table.init();
-        Dept.table = table;
-    });
-});

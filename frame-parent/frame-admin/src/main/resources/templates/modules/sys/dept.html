@@ -3,39 +3,44 @@
 <head>
 <title>部门管理</title>
 <#include "/header.html">
-<link rel="stylesheet" href="${request.contextPath}/statics/css/bootstrap-table.min.css">
-<link rel="stylesheet" href="${request.contextPath}/statics/plugins/treegrid/jquery.treegrid.css">
-<script src="${request.contextPath}/statics/libs/bootstrap-table.min.js"></script>
-<script src="${request.contextPath}/statics/plugins/treegrid/jquery.treegrid.min.js"></script>
-<script src="${request.contextPath}/statics/plugins/treegrid/jquery.treegrid.bootstrap3.js"></script>
-<script src="${request.contextPath}/statics/plugins/treegrid/jquery.treegrid.extension.js"></script>
-<script src="${request.contextPath}/statics/plugins/treegrid/tree.table.js"></script>
+<link rel="stylesheet" href="${request.contextPath}/statics/plugins/layuitreetable/css/treetable.css">
+<script src="${request.contextPath}/statics/plugins/layuitreetable/js/treetable.js"></script>
 </head>
 <body>
-<div id="rrapp" v-cloak>
-	<div v-show="showList">
-		<div class="grid-btn">
+<div id="rrapp" class="layui-fluid" v-cloak>
+
+	<div v-show="showList" class="layui-row layui-col-space5">
+		
+		<div class="layui-row layui-col-space5">
+			
 			<#if shiro.hasPermission("sys:dept:save")>
-			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			<div class="layui-col-xs1 layui-col-md2">
+    			<button class="layui-btn layui-btn-sm "  @click="add"><i class="layui-icon layui-icon-add-1"></i>新增</button>
+  			</div>
+  			</#if>  
+				
+		    <#if shiro.hasPermission("sys:dept:update")>
+		    <div class="layui-col-xs1 layui-col-md2">
+   				<button class="layui-btn layui-btn-sm layui-btn-warm" @click="update"><i class="layui-icon layui-icon-edit"></i>修改</button>
+ 				</div>
 			</#if>
-			<#if shiro.hasPermission("sys:dept:update")>
-			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
-			</#if>
+			
 			<#if shiro.hasPermission("sys:dept:delete")>
-			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+		    <div class="layui-col-xs1 layui-col-md2">
+   				<button class="layui-btn layui-btn-sm layui-btn-danger" @click="del"><i class="layui-icon layui-icon-delete"></i>删除</button>
+ 			</div>
 			</#if>
 		</div>
-		<table id="deptTable" data-mobile-responsive="true" data-click-to-select="true">
-			<thead>
-			<tr>
-				<th data-field="selectItem" data-checkbox="true"></th>
-			</tr>
-			</thead>
-		</table>
-	</div>
+		
+		<div class="layui-row layui-col-xs4 layui-col-md12">
+			<table  id="tableGrid" ></table>
+		</div>
+ 	</div>
+	
 
 	<div v-show="!showList" class="panel panel-default">
 		<div class="panel-heading">{{title}}</div>
+		<br/>
 		<form class="form-horizontal">
 			<div class="form-group">
 				<div class="col-sm-2 control-label">部门名称</div>

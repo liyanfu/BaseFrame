@@ -1,38 +1,26 @@
 $(function () {
-	layui.use('table', function(){
-	 var table = layui.table;
-	  table.render({
-	    elem: '#tableGrid'
-	    ,url: baseURL + 'sys/user/list'
-	    ,height: 312
-	    ,toolbar:''
-	    ,parseData:function(res){ //res 即为原始返回的数据
-	    	    return {
-	    	      "code": res.code, //解析接口状态
-	    	      "msg": res.msg, //解析提示文本
-	    	      "count": res.page.totalCount, //解析数据长度
-	    	      "data": res.page.list //解析数据列表
-	    	    };
-	    }
-	    ,page: true //开启分页
-	    ,cellMinWidth: 140 
-	    ,cols: [[
+	
+	var cols =  [[
 	       {type: 'checkbox'}
-	      ,{field:'userId',  title: '用户ID', sort: true}
-	      ,{field:'username',  title: '用户名'}
-	      ,{field:'deptName',  title: '所属部门'}
-	      ,{field:'email',  title: '邮箱'}
-	      ,{field:'mobile', title: '手机号'} 
-	      ,{field:'status', title: '状态', templet: function(d){
-				return d.status === 0 ? 
-						'<span class="label label-danger">禁用</span>' : 
-						'<span class="label label-success">正常</span>';
-				}}
-	      ,{field:'createTime', title: '创建时间'}
-	      
-	    ]]
-	  });
-	});
+		      ,{field:'userId',  title: '用户ID', width:80, sort: true}
+		      ,{field:'username',  title: '用户名'}
+		      ,{field:'deptName',  title: '所属部门'}
+		      ,{field:'email',  title: '邮箱'}
+		      ,{field:'mobile', title: '手机号'} 
+		      ,{field:'status', title: '状态', width:60,  templet: function(d){
+					return d.status === 0 ? 
+							'<div style="color:#f3290e">禁用</div>' : 
+							'<div style="color:#21d06d">正常</div>';
+					}}
+		      ,{field:'createTime', title: '创建时间',minWidth:140}
+		      
+		    ]];
+	
+		vm.tableId = 'tableGrid';
+		vm.table = getTableDefaults(vm.tableId,null,'sys/user/list',cols);
+		//先加载一遍，否则选择框不起作用
+		vm.getRoleList();
+		$('.layui-table-page').css('overflow-x','auto');
 });
 var setting = {
     data: {
@@ -65,6 +53,9 @@ var vm = new Vue({
             roleIdList:[]
         }
     },
+    table:null,
+    tableId: null,
+    selectId:'selectRoleIds',
     methods: {
         query: function () {
             vm.reload();
@@ -74,15 +65,10 @@ var vm = new Vue({
             vm.title = "新增";
             vm.roleList = {};
             vm.user = {deptName:null, deptId:null, status:1, roleIdList:[]};
-            console.info(1);
             //获取角色信息
             this.getRoleList();
-            console.info(3);
             vm.getDept();
-            console.info(4);
-            var form = layui.form;
-        	form.render();
-        	 console.info(5);
+            layui.form.render('radio');
         },
         getDept: function(){
             //加载部门树
@@ -96,23 +82,28 @@ var vm = new Vue({
             })
         },
         update: function () {
-            var userId = getSelectedRow();
-            if(userId == null){
-                return ;
+        	var rowData = getSelectedRow(vm.table,vm.tableId);
+        	if(rowData == null){
+                 return ;
             }
-
+        	var userId = rowData.userId;
+        	vm.user.status = rowData.status;
             vm.showList = false;
             vm.title = "修改";
-
             vm.getUser(userId);
             //获取角色信息
             this.getRoleList();
         },
         del: function () {
-            var userIds = getSelectedRows();
-            if(userIds == null){
+            var rowDatas = getSelectedRows(vm.table,vm.tableId);
+            if(rowDatas == null){
                 return ;
             }
+            
+            var userIds = [];
+            for (var i = 0; i < rowDatas.length; i++) {
+            	userIds[i] = rowDatas[i].userId;
+			}
 
             confirm('确定要删除选中的记录？', function(){
                 $.ajax({
@@ -134,6 +125,8 @@ var vm = new Vue({
         },
         saveOrUpdate: function () {
             var url = vm.user.userId == null ? "sys/user/save" : "sys/user/update";
+            vm.user.roleIdList = layui.formSelects.value('selectRoleIds', 'val');
+            vm.user.status = $('input[name="status"]:checked ').val();
             $.ajax({
                 type: "POST",
                 url: baseURL + url,
@@ -156,6 +149,10 @@ var vm = new Vue({
                 vm.user.password = null;
 
                 vm.getDept();
+                //多选赋值
+                layui.formSelects.value('selectRoleIds', vm.user.roleIdList); 
+                //渲染 单选框
+                layui.form.render('radio');
             });
         },
         getRoleList: function(){
@@ -165,7 +162,7 @@ var vm = new Vue({
         	    async : false,//取消异步  
         	    success : function(r){  
         	    	 vm.roleList = r.list;
-                     console.info(2);
+        	    	 layui.formSelects.render('selectRoleIds');
         	    }
         	});
         },
@@ -175,7 +172,7 @@ var vm = new Vue({
                 offset: '50px',
                 skin: 'layui-layer-molv',
                 title: "选择部门",
-                area: ['300px', '450px'],
+                area: ['200px', '250px'],
                 shade: 0,
                 shadeClose: false,
                 content: jQuery("#deptLayer"),
@@ -185,18 +182,29 @@ var vm = new Vue({
                     //选择上级部门
                     vm.user.deptId = node[0].deptId;
                     vm.user.deptName = node[0].name;
-
+                    console.info('index---------',index);
                     layer.close(index);
+                    //隐藏部门弹出框
+                    $('#deptLayer').hide();
+                },
+                btn2:function(){
+                	//取消
+                	 $('#deptLayer').hide();
+                },
+                cancel: function(){ 
+                    //右上角关闭回调
+                	$('#deptLayer').hide();
                 }
             });
         },
         reload: function () {
             vm.showList = true;
-            var page = $("#jqGrid").jqGrid('getGridParam','page');
-            $("#jqGrid").jqGrid('setGridParam',{
-                postData:{'username': vm.q.username},
-                page:page
-            }).trigger("reloadGrid");
+            vm.table.reload(vm.tableId, {
+            	  where:{'username': vm.q.username}
+            	  ,page: {
+            	    curr: 1 //重新从第 1 页开始
+            	  }
+            	});
         }
     }
 });

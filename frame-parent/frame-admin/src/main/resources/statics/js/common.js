@@ -19,6 +19,43 @@ var url = function(name) {
 };
 T.p = url;
 
+/**
+ * id
+ * 表格Id
+ * toolbarId
+ * 工具按钮ID
+ * url
+ * 访问url
+ * cols
+ * 列名
+ */
+var getTableDefaults = function(id,toolbarId,url,cols){
+	 var table = layui.table;
+		  table.render({
+		    elem: '#'+id
+		    ,url: baseURL + url
+		    ,height: 312
+		    ,toolbar:toolbarId
+		    ,parseData:function(res){ //res 即为原始返回的数据
+		    	    return {
+		    	      "code": res.code, //解析接口状态
+		    	      "msg": res.msg, //解析提示文本
+		    	      "count": res.page.totalCount, //解析数据长度
+		    	      "data": res.page.list //解析数据列表
+		    	    };
+		    }
+		    ,page: true //开启分页
+		    ,cellMinWidth: 140 
+		    ,cols: cols,
+		    done:function(r){
+		    	//加载完之后执行
+		    	$('.layui-table-page').css('overflow-x','auto');
+		    }
+		  });
+	return table;
+}
+
+
 //全局配置
 $.ajaxSetup({
 	dataType: "json",
@@ -45,34 +82,31 @@ window.confirm = function(msg, callback){
 	});
 }
 
-//选择一条记录
-function getSelectedRow() {
-    var grid = $("#jqGrid");
-    var rowKey = grid.getGridParam("selrow");
-    if(!rowKey){
-    	alert("请选择一条记录");
-    	return ;
+
+//选择一条记录 返回整条数据
+function getSelectedRow(table,tableId) {
+	var checkStatus = table.checkStatus(tableId); //tableId 即为基础参数 id 对应的值
+    if(checkStatus.data.length==0){
+    	alert("请选择一条记录!");
+    	return null;
     }
     
-    var selectedIDs = grid.getGridParam("selarrrow");
-    if(selectedIDs.length > 1){
-    	alert("只能选择一条记录");
-    	return ;
+    if(checkStatus.data.length > 1){
+    	alert("只能选择一条记录!");
+    	return null;
     }
     
-    return selectedIDs[0];
+    return checkStatus.data[0];
 }
 
-//选择多条记录
-function getSelectedRows() {
-    var grid = $("#jqGrid");
-    var rowKey = grid.getGridParam("selrow");
-    if(!rowKey){
-    	alert("请选择一条记录");
-    	return ;
+//选择多条记录 返回全部数据
+function getSelectedRows(table,tableId) {
+	var checkStatus = table.checkStatus(tableId); //tableId 即为基础参数 id 对应的值
+    if(checkStatus.data.length==0){
+    	alert("请至少选择一条记录!");
+    	return null;
     }
-    
-    return grid.getGridParam("selarrrow");
+    return checkStatus.data;
 }
 
 //判断是否为空
