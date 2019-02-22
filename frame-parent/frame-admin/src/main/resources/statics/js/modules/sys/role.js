@@ -1,40 +1,21 @@
 $(function () {
-    $("#jqGrid").jqGrid({
-        url: baseURL + 'sys/role/list',
-        datatype: "json",
-        colModel: [
-            { label: '角色ID', name: 'roleId', index: "role_id", width: 45, key: true },
-            { label: '角色名称', name: 'roleName', index: "role_name", width: 75 },
-            { label: '所属部门', name: 'deptName', sortable: false, width: 75 },
-            { label: '备注', name: 'remark', width: 100 },
-            { label: '创建时间', name: 'createTime', index: "create_time", width: 80}
-        ],
-        viewrecords: true,
-        height: 385,
-        rowNum: 10,
-        rowList : [10,30,50],
-        rownumbers: true,
-        rownumWidth: 25,
-        autowidth:true,
-        multiselect: true,
-        pager: "#jqGridPager",
-        jsonReader : {
-            root: "page.list",
-            page: "page.currPage",
-            total: "page.totalPage",
-            records: "page.totalCount"
-        },
-        prmNames : {
-            page:"page",
-            rows:"limit",
-            order: "order"
-        },
-        gridComplete:function(){
-            //隐藏grid底部滚动条
-            $("#jqGrid").closest(".ui-jqgrid-bdiv").css({ "overflow-x" : "hidden" });
-        }
-    });
+	
+	var cols =  [[
+	       {type: 'checkbox'}
+		      ,{field:'roleId',  title: '角色ID', width:80, sort: true}
+		      ,{field:'roleName',  title: '角色名称'}
+		      ,{field:'deptName',  title: '所属部门'}
+		      ,{field:'remark',  title: '备注'}
+		      ,{field:'createTime', title: '创建时间',minWidth:140}
+		      
+		    ]];
+	
+		vm.tableId = 'tableGrid';
+		vm.table = getTableDefaults(vm.tableId,null,'sys/role/list',cols);
+		//先加载一遍，否则选择框不起作用//先加载一遍，否则选择框不起作用
+		$('.layui-table-page').css('overflow-x','auto');
 });
+
 
 //菜单树
 var menu_ztree;
@@ -106,6 +87,8 @@ var vm = new Vue({
             deptName:null
         }
     },
+    table:null,
+    tableId: null,
     methods: {
         query: function () {
             vm.reload();
@@ -121,10 +104,11 @@ var vm = new Vue({
             vm.getDataTree();
         },
         update: function () {
-            var roleId = getSelectedRow();
-            if(roleId == null){
-                return ;
+            var rowData = getSelectedRow(vm.table,vm.tableId);
+        	if(rowData == null){
+                 return ;
             }
+        	var roleId = rowData.roleId;
 
             vm.showList = false;
             vm.title = "修改";
@@ -134,11 +118,16 @@ var vm = new Vue({
             vm.getDept();
         },
         del: function () {
-            var roleIds = getSelectedRows();
-            if(roleIds == null){
+            var rowDatas = getSelectedRows(vm.table,vm.tableId);
+            if(rowDatas == null){
                 return ;
             }
-
+            
+            var roleIds = [];
+            for (var i = 0; i < rowDatas.length; i++) {
+            	roleIds[i] = rowDatas[i].roleId;
+			}
+            
             confirm('确定要删除选中的记录？', function(){
                 $.ajax({
                     type: "POST",
@@ -250,7 +239,7 @@ var vm = new Vue({
                 offset: '50px',
                 skin: 'layui-layer-molv',
                 title: "选择部门",
-                area: ['300px', '450px'],
+                area: ['200px', '250px'],
                 shade: 0,
                 shadeClose: false,
                 content: jQuery("#deptLayer"),
@@ -260,18 +249,28 @@ var vm = new Vue({
                     //选择上级部门
                     vm.role.deptId = node[0].deptId;
                     vm.role.deptName = node[0].name;
-
                     layer.close(index);
+                    //隐藏部门弹出框
+                    $('#deptLayer').hide();
+                },
+                btn2:function(){
+                	//取消
+                	 $('#deptLayer').hide();
+                },
+                cancel: function(){ 
+                    //右上角关闭回调
+                	$('#deptLayer').hide();
                 }
             });
         },
         reload: function () {
-            vm.showList = true;
-            var page = $("#jqGrid").jqGrid('getGridParam','page');
-            $("#jqGrid").jqGrid('setGridParam',{
-                postData:{'roleName': vm.q.roleName},
-                page:page
-            }).trigger("reloadGrid");
+        	 vm.showList = true;
+             vm.table.reload(vm.tableId, {
+             	  where:{'roleName': vm.q.roleName}
+             	  ,page: {
+             	    curr: 1 //重新从第 1 页开始
+             	  }
+             	});
         }
     }
 });

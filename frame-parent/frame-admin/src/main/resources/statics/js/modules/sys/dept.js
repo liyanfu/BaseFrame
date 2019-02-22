@@ -26,7 +26,7 @@ var  initTable  = function(){
 		    ,cellMinWidth: 140 
 		    ,cols:  [[
 	        	 {type: 'radio'}
-	             ,{field: 'deptId', title: '部门ID'}
+	             ,{field: 'deptId',width:80, title: '部门ID'}
 	             ,{field: 'name', title: '部门名称'}
 	             ,{field: 'parentName', title: '上级部门'}
 	             ,{field: 'orderNum', title: '排序号'}
@@ -150,7 +150,7 @@ var vm = new Vue({
                 offset: '50px',
                 skin: 'layui-layer-molv',
                 title: "选择部门",
-                area: ['300px', '450px'],
+                area: ['200px', '250px'],
                 shade: 0,
                 shadeClose: false,
                 content: jQuery("#deptLayer"),
@@ -162,6 +162,16 @@ var vm = new Vue({
                     vm.dept.parentName = node[0].name;
 
                     layer.close(index);
+                    //隐藏部门弹出框
+                    $('#deptLayer').hide();
+                },
+                btn2:function(){
+                	//取消
+                	 $('#deptLayer').hide();
+                },
+                cancel: function(){ 
+                    //右上角关闭回调
+                	$('#deptLayer').hide();
                 }
             });
         },
@@ -171,9 +181,3 @@ var vm = new Vue({
         }
     }
 });
-
-var Dept = {
-    id: "deptTable",
-    table: null,
-    layerIndex: -1
-};

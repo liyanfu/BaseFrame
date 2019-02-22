@@ -182,7 +182,6 @@ var vm = new Vue({
                     //选择上级部门
                     vm.user.deptId = node[0].deptId;
                     vm.user.deptName = node[0].name;
-                    console.info('index---------',index);
                     layer.close(index);
                     //隐藏部门弹出框
                     $('#deptLayer').hide();

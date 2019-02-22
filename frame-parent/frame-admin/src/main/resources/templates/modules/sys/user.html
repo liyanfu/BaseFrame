@@ -3,17 +3,12 @@
 <head>
 <title>管理员列表</title>
 <#include "/header.html">
-<style>
-.aaa{
-	background-color: green;
-}
-</style>
 </head>
 <body class="layui-body">
 <div id="rrapp" class="layui-fluid" v-cloak>
 	
 	<div v-show="showList" class="layui-row layui-col-space5">
-		<div class="layui-row layui-row layui-col-xs4 layui-col-md12">
+		<div class="layui-row layui-col-xs4 layui-col-md12">
 			<input type="text" v-model="q.username" @keyup.enter="query"  autocomplete="off" placeholder="用户名" class="layui-input">
 		</div>
 		
@@ -76,11 +71,6 @@
 					</select> 
 				</div>
 			</div>
-				<!-- <label v-for="role in roleList" class="checkbox-inline">
-				<input type="checkbox" :value="role.roleId" v-model="user.roleIdList"  lay-skin="primary">{{role.roleName}}
-				</label>  <select  xm-select="selectRoleIds" >
-		    		 <option v-for="role in roleList" :value="role.roleId" v-model="user.roleIdList">{{role.roleName}}</option>
-				</select> -->
   
 			 <div class="layui-form-item">
 			    <label class="layui-form-label">密码</label>
